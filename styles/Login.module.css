@@ -1,0 +1,128 @@
+.main_box{
+    max-width: 500px;
+    height: 100vh;
+    background-color: #06151A;
+    margin: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('/images/background-img.png');
+    background-size: cover;
+}
+
+.wrapper {
+    width: 400px;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .logo_img{
+    width: 180px;
+    height: auto;
+    margin: auto;
+    display: block;
+  }
+  .login_form {
+    display: flex;
+    flex-direction: column;
+  }
+  .input_field {
+    position: relative;
+    border-bottom: 2px solid #ccc;
+    margin: 15px 0;
+  }
+  .input_field label {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 16px;
+    pointer-events: none;
+    transition: 0.15s ease;
+  }
+  .input_field input {
+    width: 100%;
+    height: 40px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #fff;
+  }
+  .input_field input:focus~label,
+  .input_field input:valid~label {
+    font-size: 0.8rem;
+    top: 10px;
+    transform: translateY(-120%);
+  }
+  .input_field i{
+    color: white;
+    font-size: 18px;
+    position: absolute;
+    top: 12px;
+    right: 5px;
+    cursor: pointer;
+  }
+  .forget {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px auto 5px auto;
+    color: #fff;
+  }
+  #remember {
+    accent-color: #fff;
+  }
+  .forget label {
+    display: flex;
+    align-items: center;
+  }
+  .forget label p {
+    margin-left: 8px;
+  }
+  .forget a{
+    font-weight: 600;
+  }
+  .wrapper a {
+    color: #efefef;
+    text-decoration: none;
+  }
+  .wrapper a:hover {
+    text-decoration: underline;
+  }
+  .submit_btn {
+    background: #fff;
+    color: #000;
+    font-weight: 600;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: 0.3s ease;
+  }
+  .submit_btn:hover {
+    color: #fff;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .register {
+    text-align: center;
+    margin-top: 5px;
+    color: #fff;
+  }
+  .register a{
+    font-weight: 600;
+  }
+
+  .redText{
+    color: red;
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
