@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { useState } from 'react'
 
 const Login = () => {
-    const [identifier, setIdentifier] = useState('')
+    const [phone_number, setphone_number] = useState('')
     const [password, setPassword] = useState('')
     const [invalidLogin, setInvalidLogin] = useState(false)
     const [showpassword, setShowpassword] = useState('password')
 
     const handleChange = (e) => {
-        if (e.target.name == 'identifier') {
-            setIdentifier(e.target.value)
+        if (e.target.name == 'phone_number') {
+            setphone_number(e.target.value)
         }
         else if (e.target.name == 'password') {
             setPassword(e.target.value)
@@ -30,7 +30,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const data = { identifier, password }
+        const data = { phone_number, password }
         let res = await fetch('https://manual.shyamplay.in/login', {
             method: 'POST',
             headers: {
@@ -59,8 +59,8 @@ const Login = () => {
                     <form method='POST' onSubmit={handleSubmit} className={styles.login_form}>
                         <Image width={200} height={200} src="/images/logo.png" alt="" className={styles.logo_img} />
                         <div className={styles.input_field}>
-                            <input type="text" name='identifier' value={identifier} onChange={handleChange} required />
-                            <label>Enter Your Email Or Phone No.</label>
+                            <input type="text" name='phone_number' value={phone_number} onChange={handleChange} required />
+                            <label>Enter Your Phone No.</label>
                         </div>
                         <div className={styles.input_field}>
                             <input type={showpassword} name='password' value={password} onChange={handleChange} required />

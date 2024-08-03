@@ -8,7 +8,6 @@ const Register = () => {
     const [username, setUserName] = useState('')
     const [phone_number, setPhoneNumber] = useState('')
     const [otp, setOTP] = useState('')
-    const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const role = 'user'
     const [invalidOTP, setInvalidOTP] = useState(false)
@@ -25,9 +24,6 @@ const Register = () => {
         }
         else if (e.target.name == 'otp') {
             setOTP(e.target.value)
-        }
-        else if (e.target.name == 'email') {
-            setEmail(e.target.value)
         }
         else if (e.target.name == 'password') {
             setPassword(e.target.value)
@@ -61,7 +57,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const data = { phone_number, otp, email, username, password, role }
+        const data = { phone_number, otp, username, password, role }
         let res = await fetch('https://manual.shyamplay.in/register', {
             method: 'POST',
             headers: {
@@ -111,10 +107,6 @@ const Register = () => {
                             <label>Enter OTP</label>
                         </div>
                         {invalidOTP && <p className={styles.redText}>OTP Is Invalid</p>}
-                        <div className={styles.input_field}>
-                            <input type="text" name='email' value={email} onChange={handleChange} required />
-                            <label>Enter Email</label>
-                        </div>
                         <div className={styles.input_field}>
                             <input type={showpassword} name='password' value={password} onChange={handleChange} required />
                             <label>Enter Password</label>
