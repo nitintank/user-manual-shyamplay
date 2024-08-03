@@ -20,11 +20,13 @@ const Transaction = () => {
 
     useEffect(() => {
         const fetchTransactionHistory = async () => {
-            try {
-                const types = transactionType === 'all' ? ['credit', 'deposit', 'withdraw', 'password_change'] : [transactionType];
-                const allTransactions = [];
+            const types = transactionType === 'all' ? ['credit', 'deposit', 'withdraw', 'password_change'] : [transactionType];
+            const allTransactions = [];
+            const errorMessages = [];
 
-                for (const type of types) {
+            // Helper function to fetch data for each type
+            const fetchData = async (type) => {
+                try {
                     const response = await fetch(`https://manual.shyamplay.in/transaction/history?type=${type}`, {
                         method: 'GET',
                         headers: {
@@ -33,19 +35,33 @@ const Transaction = () => {
                     });
 
                     if (!response.ok) {
-                        throw new Error(`Error: ${response.status}`);
+                        throw new Error(`Error fetching ${type} data: ${response.status}`);
                     }
 
                     const data = await response.json();
-                    allTransactions.push(...data);
-                }
 
+                    // Handle case when the response contains a message indicating no records
+                    if (data.message) {
+                        errorMessages.push(`No ${type} records found`);
+                    } else {
+                        allTransactions.push(...data);
+                    }
+                } catch (error) {
+                    errorMessages.push(`Failed to fetch ${type} data: ${error.message}`);
+                }
+            };
+
+            // Execute all fetch operations concurrently
+            await Promise.all(types.map(type => fetchData(type)));
+
+            // Set transactions and handle errors
+            if (allTransactions.length === 0 && errorMessages.length > 0) {
+                setError(errorMessages.join(' | '));
+            } else {
+                setError(null);
                 // Sort transactions by created_at date
                 allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
                 setTransactions(allTransactions);
-            } catch (error) {
-                setError(error.message);
             }
         };
 
@@ -102,28 +118,30 @@ const Transaction = () => {
                         </select>
                     </div>
 
-                    {error && <div>Error: {error}</div>}
-
-                    {transactions.length === 0 ? (
-                        <div className={styles.whiteText}>No Transaction History.</div>
+                    {error ? (
+                        <div className={styles.whiteText}>No Record Found !</div>
                     ) : (
-                        <div className={styles.all_new_id_box}>
-                            {transactions.map((transaction) => (
-                                <div className={styles.new_id_box} key={transaction.credit_id || transaction.transaction_id || transaction.request_id}>
-                                    <div className={styles.id_inner_box_1}>
-                                        {transaction.credit_name && <p><strong>UserName:</strong> {transaction.credit_name}</p>}
-                                        <p><strong>Company Name:</strong> {transaction.company_name}</p>
-                                        <p><strong>Website Link:</strong> <Link href={`https://${transaction.website_link}`}>{transaction.website_link}</Link></p>
-                                        {transaction.amount && <p><strong>Amount:</strong> {transaction.amount}</p>}
-                                        {transaction.transaction_type && <p><strong>Transaction Type:</strong> {transaction.transaction_type}</p>}
-                                        {transaction.created_at && <p><strong>Created At:</strong> {transaction.created_at}</p>}
+                        transactions.length === 0 ? (
+                            <div className={styles.whiteText}>No Transaction History Found !</div>
+                        ) : (
+                            <div className={styles.all_new_id_box}>
+                                {transactions.map((transaction) => (
+                                    <div className={styles.new_id_box} key={transaction.credit_id || transaction.transaction_id || transaction.request_id}>
+                                        <div className={styles.id_inner_box_1}>
+                                            {transaction.credit_name && <p><strong>UserName:</strong> {transaction.credit_name}</p>}
+                                            <p><strong>Company Name:</strong> {transaction.company_name}</p>
+                                            <p><strong>Website Link:</strong> <Link href={`https://${transaction.website_link}`}>{transaction.website_link}</Link></p>
+                                            {transaction.amount && <p><strong>Amount:</strong> {transaction.amount}</p>}
+                                            {transaction.transaction_type && <p><strong>Transaction Type:</strong> {transaction.transaction_type}</p>}
+                                            {transaction.created_at && <p><strong>Created At:</strong> {transaction.created_at}</p>}
+                                        </div>
+                                        <div className={styles.id_inner_box_2}>
+                                            <button className={`${getStatusClassName(transaction.status)}`}>{transaction.status}</button>
+                                        </div>
                                     </div>
-                                    <div className={styles.id_inner_box_2}>
-                                        <button className={`${getStatusClassName(transaction.status)}`}>{transaction.status}</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )
                     )}
                 </div>
             </section>
