@@ -170,7 +170,7 @@ const Profile = () => {
 
         <nav className={styles.navbar}>
           <i className="fa-solid fa-bars" onClick={toggleSidebar}></i>
-          <Image width={200} height={200} src="/images/logo.png" alt="" />
+          <Link href="/"><Image width={200} height={200} src="/images/logo.png" alt="" /></Link>
         </nav>
 
         <div className={styles.all_new_id_big_box}>

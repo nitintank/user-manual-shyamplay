@@ -103,7 +103,7 @@ const Transaction = () => {
 
                 <nav className={styles.navbar}>
                     <i className="fa-solid fa-bars" onClick={toggleSidebar}></i>
-                    <Image width={200} height={200} src="/images/logo.png" alt="" />
+                    <Link href="/"><Image width={200} height={200} src="/images/logo.png" alt="" /></Link>
                 </nav>
 
                 <div className={styles.all_new_id_big_box}>
@@ -134,6 +134,7 @@ const Transaction = () => {
                                             {transaction.amount && <p><strong>Amount:</strong> {transaction.amount}</p>}
                                             {transaction.transaction_type && <p><strong>Transaction Type:</strong> {transaction.transaction_type}</p>}
                                             {transaction.created_at && <p><strong>Created At:</strong> {transaction.created_at}</p>}
+                                            {transaction.description && <p><strong>Description:</strong> {transaction.description}</p>}
                                         </div>
                                         <div className={styles.id_inner_box_2}>
                                             <button className={`${getStatusClassName(transaction.status)}`}>{transaction.status}</button>

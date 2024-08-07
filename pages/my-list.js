@@ -10,21 +10,23 @@ const MyList = () => {
     const [mycreateId, setMycreateId] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const [showWithdrawModal, setWithdrawModal] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [amount, setAmount] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('upi');
     const [bankDetails, setBankDetails] = useState(null);
     const [upiQRCode, setUpiQRCode] = useState(null);
     const [responseMessage, setResponseMessage] = useState(null);
-    const [upiRefNumber, setUpiRefNumber] = useState('');
     const [accountName, setAccountName] = useState('');
     const [accountNumber, setAccountNumber] = useState('');
     const [ifscCode, setIfscCode] = useState('');
     const [upiID, setUpiID] = useState('');
     const [paymentScreenshot, setPaymentScreenshot] = useState(null);
     const [qrcodeimage, setQrcodeImage] = useState(null);
+    const [upiRefNumber, setUpiRefNumber] = useState('');
+    const [selectedUpiId, setSelectedUpiId] = useState('');
+    const [adminUpiId, setAdminUpiId] = useState('');
+    const [adminBankId, setAdminBankId] = useState('');
+    const [selectedBank, setSelectedBank] = useState(null);
 
     const toggleDepositPopup = (id) => {
         setSelectedId(id);
@@ -91,7 +93,7 @@ const MyList = () => {
                 }
 
                 const data = await response.json();
-                setBankDetails(data.bank_details[0]);
+                setBankDetails(data.bank_details);
             } catch (error) {
                 setResponseMessage(error.message);
             }
@@ -106,36 +108,11 @@ const MyList = () => {
                 }
 
                 const data = await response.json();
-                setUpiQRCode(data.upi_details[0]);
+                setUpiQRCode(data.upi_details);
             } catch (error) {
                 setResponseMessage(error.message);
             }
         }
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setAmount('');
-        setPaymentMethod('bank');
-        setBankDetails(null);
-        setUpiQRCode(null);
-        setResponseMessage(null);
-        setUpiRefNumber('');
-        setPaymentScreenshot(null);
-    };
-
-    const handleWithdrawOpenModal = (id) => {
-        setSelectedId(id);
-        setWithdrawModal(true);
-    };
-
-    const handleWithdrawCloseModal = () => {
-        setWithdrawModal(false);
-        setAmount('');
-        setPaymentMethod('bank');
-        setBankDetails(null);
-        setUpiQRCode(null);
-        setResponseMessage(null);
     };
 
     const handleAmountChange = (e) => {
@@ -147,6 +124,9 @@ const MyList = () => {
         formData.append('payment_method', paymentMethod);
         formData.append('amount', amount);
         formData.append('upi_ref_number', upiRefNumber);
+        formData.append('admin_bank_id', adminBankId);
+        formData.append('admin_upi_id', adminUpiId);
+
         if (paymentScreenshot) {
             formData.append('payment_screenshort', paymentScreenshot);
         }
@@ -169,7 +149,6 @@ const MyList = () => {
             }
 
             setResponseMessage(data.message);
-            handleCloseModal();
         } catch (error) {
             setResponseMessage(error.message);
         }
@@ -205,7 +184,6 @@ const MyList = () => {
             }
 
             setResponseMessage(data.message);
-            handleWithdrawCloseModal();
         } catch (error) {
             setResponseMessage(error.message);
         }
@@ -229,6 +207,32 @@ const MyList = () => {
             setResponseMessage(error.message);
         }
     };
+
+    const handleUpiChange = (e) => {
+        const selectedUpi = e.target.value;
+        setSelectedUpiId(selectedUpi);
+        const upiDetail = upiQRCode.find(upi => upi.upi_id === selectedUpi);
+        if (upiDetail) {
+            setAdminUpiId(upiDetail.id);
+        }
+    };
+
+    const handleBankChange = (e) => {
+        const selectedBankName = e.target.value;
+        const bankDetail = bankDetails.find(bank => bank.bank_name === selectedBankName);
+        if (bankDetail) {
+            setSelectedBank(bankDetail);
+            setAdminBankId(bankDetail.id);
+        }
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <>
@@ -298,12 +302,7 @@ const MyList = () => {
                 {depositPopup && <div className={styles.pop_up_box_section} id="deposit-popup">
                     <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleDepositPopup}></i>
                     <h3>Deposit Amount</h3>
-                    {/* <div className={styles.pop_up_site_box}>
-                        <Image width={200} height={200} src="/images/host-perfy-box.png" alt="" />
-                        <h4>HostPerfy</h4>
-                        <p>www.hostperfy.com</p>
-                    </div> */}
-                    <form className={styles.pop_up_box_form_1}>
+                    <div className={styles.pop_up_box_form_1}>
                         <input type="text" placeholder="Enter Amount" value={amount} onChange={handleAmountChange} />
                         <div className={styles.radio_input}>
                             <label>
@@ -317,8 +316,25 @@ const MyList = () => {
                             <span className={styles.selection}></span>
                         </div>
                         {paymentMethod === 'upi' && upiQRCode && (<div className={styles.upi_detail_box}>
-                            <Image width={200} height={200} src={`https://manual.shyamplay.in/${upiQRCode.qr_code}`} alt="UPI QR Code" className={styles.qr_code_img} />
-                            <p className={styles.upi_para}>UPI ID: {upiQRCode.upi_id} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${upiQRCode.upi_id}`)}></i></p>
+                            <div className={styles.zradio_inputs}>
+                                {upiQRCode.map((upi, index) => (
+                                    <label key={upi.id}>
+                                        <input className={styles.zradio_input} type="radio" name="paymentDetail" value={upi.upi_id} onChange={handleUpiChange} />
+                                        <span className={styles.zradio_tile}>
+                                            <span className={styles.zradio_icon}>
+                                                <Image width={200} height={200} src="/images/upi.png" alt="UPI QR Code" />
+                                            </span>
+                                            <span className={styles.zradio_label}>UPI {index + 1}</span>
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                            {selectedUpiId && (
+                                <>
+                                    <Image width={200} height={200} src={`https://manual.shyamplay.in/${upiQRCode.find(upi => upi.upi_id === selectedUpiId).qr_code}`} alt="UPI QR Code" className={styles.qr_code_img} />
+                                    <p className={styles.upi_para}>UPI Id = {selectedUpiId} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedUpiId}`)}></i></p>
+                                </>
+                            )}
                             <input type="text" placeholder="Enter UTR ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
                             <label for="">Payment Screenshot</label>
                             <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />
@@ -326,10 +342,27 @@ const MyList = () => {
                         )}
                         {paymentMethod === 'bank' && bankDetails && (
                             <div className={styles.bank_detail_box}>
-                                <p>Bank Name: {bankDetails.bank_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.bank_name}`)}></i></p>
-                                <p>Account Number: {bankDetails.bank_account_number} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.bank_account_number}`)}></i></p>
-                                <p>IFSC Code: {bankDetails.ifsc_code} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.ifsc_code}`)}></i></p>
-                                <p>Account Name: {bankDetails.account_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.account_name}`)}></i></p>
+                                <div className={styles.zradio_inputs}>
+                                    {bankDetails.map((bank, index) => (
+                                        <label kkey={bank.id}>
+                                            <input className={styles.zradio_input} type="radio" name="paymentDetail" value={bank.bank_name} onChange={handleBankChange} />
+                                            <span className={styles.zradio_tile}>
+                                                <span className={styles.zradio_icon}>
+                                                    <Image width={200} height={200} src="/images/bank.jpeg" alt="UPI QR Code" />
+                                                </span>
+                                                <span className={styles.zradio_label}>UPI {index + 1}</span>
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
+                                {selectedBank && (
+                                    <>
+                                        <p>Bank Name: {selectedBank.bank_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_name}`)}></i></p>
+                                        <p>Account Number: {selectedBank.bank_account_number} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_account_number}`)}></i></p>
+                                        <p>IFSC Code: {selectedBank.ifsc_code} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.ifsc_code}`)}></i></p>
+                                        <p>Account Name: {selectedBank.account_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.account_name}`)}></i></p>
+                                    </>
+                                )}
                                 <input type="text" placeholder="Enter Transaction ID" id="upiRefNumber" value={upiRefNumber}
                                     onChange={(e) => setUpiRefNumber(e.target.value)} required />
                                 <label for="">Payment Screenshot</label>
@@ -338,7 +371,7 @@ const MyList = () => {
                         )}
                         <button type="submit" className={styles.create_id_btn} onClick={handleDepositSubmit}><i className="fa-solid fa-circle-check"></i> Deposit Now</button>
                         {responseMessage && <p>{responseMessage}</p>}
-                    </form>
+                    </div>
                 </div>}
 
                 {withdrawPopup && <div className={styles.pop_up_box_section} id="withdraw-popup">
@@ -349,7 +382,7 @@ const MyList = () => {
                         <h4>HostPerfy</h4>
                         <p>www.hostperfy.com</p>
                     </div> */}
-                    <form className={styles.pop_up_box_form_1}>
+                    <div className={styles.pop_up_box_form_1}>
                         <input type="text" placeholder="Enter Amount" value={amount} onChange={handleAmountChange} />
                         <div className={styles.radio_input}>
                             <label>
@@ -381,7 +414,7 @@ const MyList = () => {
                         )}
                         <button type="submit" className={styles.create_id_btn} onClick={handleWithdrawSubmit}><i className="fa-solid fa-circle-check"></i> Withdraw Now</button>
                         {responseMessage && <p className={styles.responseMessage}>{responseMessage}</p>}
-                    </form>
+                    </div>
                 </div>}
             </section>
         </>

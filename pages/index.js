@@ -16,10 +16,14 @@ export default function Home() {
   const [amount, setAmount] = useState('');
   const [responseMessage, setResponseMessage] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('upi');
-  const [bankDetails, setBankDetails] = useState(null);
+  const [bankDetails, setBankDetails] = useState([]);
   const [upiQRCode, setUpiQRCode] = useState('');
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
   const [upiRefNumber, setUpiRefNumber] = useState('');
+  const [selectedUpiId, setSelectedUpiId] = useState('');
+  const [adminUpiId, setAdminUpiId] = useState('');
+  const [adminBankId, setAdminBankId] = useState('');
+  const [selectedBank, setSelectedBank] = useState(null);
 
   const toggleSidebar = () => {
     setSidebar(!sidebar);
@@ -87,6 +91,8 @@ export default function Home() {
     formData.append('amount', amount);
     formData.append('payment_method', paymentMethod.toUpperCase());
     formData.append('upi_ref_number', upiRefNumber);
+    formData.append('admin_bank_id', adminBankId);
+    formData.append('admin_upi_id', adminUpiId);
 
     if (paymentScreenshot) {
       formData.append('payment_screenshot', paymentScreenshot); // Corrected the field name
@@ -126,7 +132,7 @@ export default function Home() {
         }
 
         const data = await response.json();
-        setBankDetails(data.bank_details[0]);
+        setBankDetails(data.bank_details);
       } catch (error) {
         setResponseMessage(error.message);
       }
@@ -141,10 +147,28 @@ export default function Home() {
         }
 
         const data = await response.json();
-        setUpiQRCode(data.upi_details[0]);
+        setUpiQRCode(data.upi_details);
       } catch (error) {
         setResponseMessage(error.message);
       }
+    }
+  };
+
+  const handleUpiChange = (e) => {
+    const selectedUpi = e.target.value;
+    setSelectedUpiId(selectedUpi);
+    const upiDetail = upiQRCode.find(upi => upi.upi_id === selectedUpi);
+    if (upiDetail) {
+      setAdminUpiId(upiDetail.id);
+    }
+  };
+
+  const handleBankChange = (e) => {
+    const selectedBankName = e.target.value;
+    const bankDetail = bankDetails.find(bank => bank.bank_name === selectedBankName);
+    if (bankDetail) {
+      setSelectedBank(bankDetail);
+      setAdminBankId(bankDetail.id);
     }
   };
 
@@ -233,8 +257,25 @@ export default function Home() {
               <span className={styles.selection}></span>
             </div>
             {paymentMethod === 'upi' && upiQRCode && (<div className={styles.upi_detail_box}>
-              <Image width={200} height={200} src={`https://manual.shyamplay.in/${upiQRCode.qr_code}`} alt="UPI QR Code" className={styles.qr_code_img} />
-              <p className={styles.upi_para}>UPI Id = {upiQRCode.upi_id} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${upiQRCode.upi_id}`)}></i></p>
+
+              <div className={styles.zradio_inputs}>
+                {upiQRCode.map((upi, index) => (
+                  <label key={upi.id}>
+                    <input className={styles.zradio_input} type="radio" name="paymentDetail" value={upi.upi_id} onChange={handleUpiChange} />
+                    <span className={styles.zradio_tile}>
+                      <span className={styles.zradio_icon}>
+                        <Image width={200} height={200} src="/images/upi.png" alt="UPI QR Code" />
+                      </span>
+                      <span className={styles.zradio_label}>UPI {index + 1}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {selectedUpiId && (
+                <>
+                  <Image width={200} height={200} src={`https://manual.shyamplay.in/${upiQRCode.find(upi => upi.upi_id === selectedUpiId).qr_code}`} alt="UPI QR Code" className={styles.qr_code_img} />
+                  <p className={styles.upi_para}>UPI Id = {selectedUpiId} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedUpiId}`)}></i></p>
+                </>)}
               <input type="text" placeholder="Enter UTR ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
               <label htmlFor="">Payment Screenshot</label>
               <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />
@@ -242,10 +283,28 @@ export default function Home() {
             )}
             {paymentMethod === 'bank' && bankDetails && (
               <div className={styles.bank_detail_box}>
-                <p>Bank Name: {bankDetails.bank_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.bank_name}`)}></i></p>
-                <p>Account Number: {bankDetails.bank_account_number} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.bank_account_number}`)}></i></p>
-                <p>IFSC Code: {bankDetails.ifsc_code} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.ifsc_code}`)}></i></p>
-                <p>Account Name: {bankDetails.account_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${bankDetails.account_name}`)}></i></p>
+
+                <div className={styles.zradio_inputs}>
+                  {bankDetails.map((bank, index) => (
+                    <label kkey={bank.id}>
+                      <input className={styles.zradio_input} type="radio" name="paymentDetail" value={bank.bank_name} onChange={handleBankChange} />
+                      <span className={styles.zradio_tile}>
+                        <span className={styles.zradio_icon}>
+                          <Image width={200} height={200} src="/images/bank.jpeg" alt="UPI QR Code" />
+                        </span>
+                        <span className={styles.zradio_label}>UPI {index + 1}</span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {selectedBank && (
+                  <>
+                    <p>Bank Name: {selectedBank.bank_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_name}`)}></i></p>
+                    <p>Account Number: {selectedBank.bank_account_number} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_account_number}`)}></i></p>
+                    <p>IFSC Code: {selectedBank.ifsc_code} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.ifsc_code}`)}></i></p>
+                    <p>Account Name: {selectedBank.account_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.account_name}`)}></i></p>
+                  </>
+                )}
                 <input type="text" placeholder="Enter Transaction ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
                 <label htmlFor="">Payment Screenshot</label>
                 <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />

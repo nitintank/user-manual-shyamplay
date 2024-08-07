@@ -470,3 +470,124 @@
 .demo_detail i{
   cursor: pointer;
 }
+
+/* UPI / Bank CSS */
+
+.zradio_inputs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  overflow-x: scroll;
+}
+
+.zradio_inputs > * {
+  margin: 6px;
+}
+
+.zradio_input:checked + .zradio_tile {
+  border-color: #2260ff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  color: #2260ff;
+}
+
+.zradio_input:checked + .zradio_tile:before {
+  transform: scale(1);
+  opacity: 1;
+  background-color: #2260ff;
+  border-color: #2260ff;
+}
+
+.zradio_input:checked + .zradio_tile .zradio_icon svg {
+  fill: #2260ff;
+}
+
+.zradio_input:checked + .zradio_tile .zradio_label {
+  color: #2260ff;
+}
+
+.zradio_input:focus + .zradio_tile {
+  border-color: #2260ff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1), 0 0 0 4px #b5c9fc;
+}
+
+.zradio_input:focus + .zradio_tile:before {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zradio_icon img{
+  width: 80%;
+  height: auto;
+  margin: 10px auto;
+  display: block;
+}
+
+.zradio_tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  min-height: 80px;
+  border-radius: 0.5rem;
+  border: 2px solid #b5bfd9;
+  background-color: #fff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  transition: 0.15s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.zradio_tile:before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 0.35rem;
+  height: 0.35rem;
+  border: 2px solid #b5bfd9;
+  background-color: #fff;
+  border-radius: 50%;
+  top: 0.25rem;
+  left: 0.25rem;
+  opacity: 0;
+  transform: scale(0);
+  transition: 0.25s ease;
+}
+
+.zradio_tile:hover {
+  border-color: #2260ff;
+}
+
+.zradio_tile:hover:before {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.zradio_icon svg {
+  width: 2rem;
+  height: 2rem;
+  fill: #494949;
+}
+
+.zradio_label {
+  color: #707070;
+  transition: 0.375s ease;
+  text-align: center;
+  font-size: 16px;
+}
+
+.zradio_input {
+  clip: rect(0 0 0 0);
+  -webkit-clip-path: inset(100%);
+  clip-path: inset(100%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
