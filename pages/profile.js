@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styles from "@/styles/Profile.module.css";
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Profile = () => {
   const [sidebar, setSidebar] = useState(false);
@@ -97,10 +99,12 @@ const Profile = () => {
       }
       const responseData = await response.json();
       console.log('Profile updated successfully:', responseData);
+      toast.success('Profile updated successfully');
       setSuccessMessage2(responseData.message);
       // Optionally, show success message or redirect to another page
     } catch (error) {
       console.error('Error updating profile:', error.message);
+      toast.error(`Error: ${error.message}`);
       // Handle error as needed (show error message to user, retry logic, etc.)
     }
   };
@@ -138,11 +142,13 @@ const Profile = () => {
         setError(data.error || 'Failed to change password');
       } else {
         setSuccessMessage(data.message);
+        toast.success('Password Changed successfully!');
         setOldPassword('');
         setNewPassword('');
         setConfirmPassword('');
       }
     } catch (error) {
+      toast.error(`Error: ${error.message}`);
       setError('Failed to change password');
     }
   };
@@ -152,6 +158,7 @@ const Profile = () => {
 
   return (
     <>
+    <ToastContainer />
       <section className={styles.main_box}>
         {sidebar && <div className={styles.sidebar}>
           <Link href="/profile" className={styles.profile_box}>

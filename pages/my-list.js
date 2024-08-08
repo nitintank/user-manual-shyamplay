@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styles from "@/styles/MyList.module.css";
 import Link from 'next/link';
 import Image from 'next/image';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MyList = () => {
     const [depositPopup, setDepositPopup] = useState(false);
@@ -146,11 +148,14 @@ const MyList = () => {
             const data = await response.json();
             if (!response.ok) {
                 throw new Error(data.error || 'An error occurred while processing the request.');
+
             }
 
             setResponseMessage(data.message);
+            toast.success('Payment Deposite Request send to admin successfully!');
         } catch (error) {
             setResponseMessage(error.message);
+            toast.error(`Error: ${error.message}`);
         }
     };
 
@@ -184,8 +189,10 @@ const MyList = () => {
             }
 
             setResponseMessage(data.message);
+            toast.success('withdraw Request Send to Admin successfully!');
         } catch (error) {
             setResponseMessage(error.message);
+            toast.error(`Error: ${error.message}`);
         }
     };
 
@@ -203,8 +210,10 @@ const MyList = () => {
                 throw new Error(data.error || 'An error occurred while processing the request.');
             }
             setResponseMessage(data.message);
+            toast.success('Password update request submitted to admin');
         } catch (error) {
             setResponseMessage(error.message);
+            toast.error(`Error: ${error.message}`);
         }
     };
 
@@ -226,6 +235,10 @@ const MyList = () => {
         }
     };
 
+    const handleCopy = (text) => {
+        navigator.clipboard.writeText(text);
+        toast.success('Copied to clipboard successfully!');
+    };
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -234,8 +247,10 @@ const MyList = () => {
         return <div>Error: {error}</div>;
     }
 
+
     return (
         <>
+           <ToastContainer />
             <section className={styles.main_box}>
 
                 {sidebar && <div className={styles.sidebar}>
@@ -279,8 +294,16 @@ const MyList = () => {
                                 <Image width={200} height={200} src={`https://manual.shyamplay.in/${id.logo}`} alt={`Image of ${id.logo}`} />
                                 <div className={styles.id_content_box}>
                                     <Link href={`https://${id.website_link}`}>{id.website_link} <i className="fa-solid fa-arrow-up-right-from-square"></i></Link>
-                                    <p>Username: {id.name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.name}`)}></i></p>
-                                    <p>Password: {id.password} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.password}`)}></i></p>
+                                    {/* <p>Username: {id.name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.name}`)}></i></p>
+                                    <p>Password: {id.password} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.password}`)}></i></p> */}
+                                    <p>
+                                    Username: {id.name} 
+                                    <i className="fa-solid fa-copy" onClick={() => handleCopy(id.name)}></i>
+                                </p>
+                                <p>
+                                    Password: {id.password} 
+                                    <i className="fa-solid fa-copy" onClick={() => handleCopy(id.password)}></i>
+                                </p>
                                     <div className={styles.id_btn_box}>
                                         <button className={styles.id_btn_1} onClick={() => toggleDepositPopup(id.credit_id)}>Deposit</button>
                                         <button className={styles.id_btn_2} onClick={() => toggleWithdrawPopup(id.credit_id)}>Withdraw</button>
@@ -377,11 +400,7 @@ const MyList = () => {
                 {withdrawPopup && <div className={styles.pop_up_box_section} id="withdraw-popup">
                     <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleWithdrawPopup}></i>
                     <h3>Withdraw Amount</h3>
-                    {/* <div className={styles.pop_up_site_box}>
-                        <Image width={200} height={200} src="/images/host-perfy-box.png" alt="" />
-                        <h4>HostPerfy</h4>
-                        <p>www.hostperfy.com</p>
-                    </div> */}
+               
                     <div className={styles.pop_up_box_form_1}>
                         <input type="text" placeholder="Enter Amount" value={amount} onChange={handleAmountChange} />
                         <div className={styles.radio_input}>

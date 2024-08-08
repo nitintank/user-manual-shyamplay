@@ -2,6 +2,8 @@ import styles from "@/styles/Home.module.css";
 import React, { useEffect, useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
   const [sidebar, setSidebar] = useState(false);
@@ -56,8 +58,10 @@ export default function Home() {
 
         const data = await response.json();
         setCompanies(data);
+       
       } catch (error) {
         setError(error.message);
+        
       } finally {
         setLoading(false);
       }
@@ -113,8 +117,10 @@ export default function Home() {
       }
 
       setResponseMessage(data.message);
+      toast.success('User CreatedID Created  successfully!');
     } catch (error) {
       setResponseMessage(error.message);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
@@ -182,6 +188,7 @@ export default function Home() {
 
   return (
     <>
+   <ToastContainer />
       <section className={styles.main_box}>
         {sidebar && <div className={styles.sidebar}>
           <Link href="/profile" className={styles.profile_box}>
@@ -233,15 +240,18 @@ export default function Home() {
             ))}
           </div>
         )}
-
+       
         {createIdPopup && <div className={styles.pop_up_box_section}>
+      
           <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleCreateIdPopup}></i>
+          
           <h3>Create ID</h3>
           <div className={styles.pop_up_site_box}>
             <Image width={200} height={200} src={`https://manual.shyamplay.in/${selectedCompany.logo}`} alt={selectedCompany.name} />
             <h4>{selectedCompany.company_name}</h4>
             <p>{selectedCompany.website_link}</p>
           </div>
+      
           <form onSubmit={handleFormSubmit} className={styles.pop_up_box_form_1}>
             <input type="text" id="username" placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
             <input type="text" id="amount" placeholder="Enter Amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
@@ -312,7 +322,7 @@ export default function Home() {
             )}
             <button type="submit" className={styles.create_id_btn}><i className="fa-solid fa-circle-check"></i> Create Instant ID</button>
           </form>
-          {responseMessage && <div>{responseMessage}</div>}
+        
         </div>}
 
         {demoLoginPopup && <div className={styles.pop_up_box_section} id="demo-login-popup">
