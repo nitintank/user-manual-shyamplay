@@ -159,13 +159,13 @@
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
 }
 
 .id_btn_1 {
-    padding: 2px 12px;
+    padding: 2px 5px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 12px;
     border: none;
     background-color: #E3F513;
     color: black;
@@ -173,9 +173,9 @@
 }
 
 .id_btn_2 {
-    padding: 2px 12px;
+    padding: 2px 5px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 12px;
     border: none;
     background-color: #19BD3D;
     color: white;
@@ -183,9 +183,9 @@
 }
 
 .id_btn_3 {
-    padding: 2px 12px;
+    padding: 2px 5px;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 12px;
     border: none;
     background-color: #1989bd;
     color: white;
@@ -448,6 +448,7 @@
     background-color: #0D3446;
     padding: 10px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .popup_cross {

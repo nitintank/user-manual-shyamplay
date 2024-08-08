@@ -152,7 +152,8 @@ const MyList = () => {
             }
 
             setResponseMessage(data.message);
-            toast.success('Payment Deposit Request Submited Successfully!');
+            toast.success('Deposit Request Submited Successfully!');
+            setDepositPopup(false);
         } catch (error) {
             setResponseMessage(error.message);
             toast.error(`Error: ${error.message}`);
@@ -190,6 +191,7 @@ const MyList = () => {
 
             setResponseMessage(data.message);
             toast.success('Withdraw Request Submited Successfully!');
+            setWithdrawPopup(false);
         } catch (error) {
             setResponseMessage(error.message);
             toast.error(`Error: ${error.message}`);
@@ -282,7 +284,6 @@ const MyList = () => {
                 </div>
 
                 <div className={styles.id_created_big_box}>
-                    {responseMessage && <p className={styles.responseMessage}><i className={`fa-regular fa-circle-xmark`} onClick={() => setResponseMessage('')}></i> {responseMessage}</p>}
                     {mycreateId.map(id => (
                         <div className={styles.id_created_box} key={id.credit_id}>
                             <div className={styles.id_created_upper_box}>
@@ -392,7 +393,6 @@ const MyList = () => {
                             </div>
                         )}
                         <button type="submit" className={styles.create_id_btn} onClick={handleDepositSubmit}><i className="fa-solid fa-circle-check"></i> Deposit Now</button>
-                        {responseMessage && <p>{responseMessage}</p>}
                     </div>
                 </div>}
 
@@ -431,7 +431,6 @@ const MyList = () => {
                             </div>
                         )}
                         <button type="submit" className={styles.create_id_btn} onClick={handleWithdrawSubmit}><i className="fa-solid fa-circle-check"></i> Withdraw Now</button>
-                        {responseMessage && <p className={styles.responseMessage}>{responseMessage}</p>}
                     </div>
                 </div>}
             </section>

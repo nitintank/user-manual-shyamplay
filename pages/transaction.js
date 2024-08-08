@@ -127,17 +127,17 @@ const Transaction = () => {
                             <div className={styles.all_new_id_box}>
                                 {transactions.map((transaction) => (
                                     <div className={styles.new_id_box} key={transaction.credit_id || transaction.transaction_id || transaction.request_id}>
+                                        <div className={styles.id_inner_box_2}>
+                                            {transaction.created_at && <p><strong>Created At:</strong> {transaction.created_at}</p>}
+                                            <button className={`${getStatusClassName(transaction.status)}`}>{transaction.status}</button>
+                                        </div>
                                         <div className={styles.id_inner_box_1}>
                                             {transaction.credit_name && <p><strong>UserName:</strong> {transaction.credit_name}</p>}
                                             <p><strong>Company Name:</strong> {transaction.company_name}</p>
                                             <p><strong>Website Link:</strong> <Link href={`https://${transaction.website_link}`}>{transaction.website_link}</Link></p>
                                             {transaction.amount && <p><strong>Amount:</strong> {transaction.amount}</p>}
                                             {transaction.transaction_type && <p><strong>Transaction Type:</strong> {transaction.transaction_type}</p>}
-                                            {transaction.created_at && <p><strong>Created At:</strong> {transaction.created_at}</p>}
                                             {transaction.description && <p><strong>Description:</strong> {transaction.description}</p>}
-                                        </div>
-                                        <div className={styles.id_inner_box_2}>
-                                            <button className={`${getStatusClassName(transaction.status)}`}>{transaction.status}</button>
                                         </div>
                                     </div>
                                 ))}
