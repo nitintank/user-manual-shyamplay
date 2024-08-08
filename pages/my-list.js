@@ -152,7 +152,7 @@ const MyList = () => {
             }
 
             setResponseMessage(data.message);
-            toast.success('Payment Deposite Request send to admin successfully!');
+            toast.success('Payment Deposit Request Submited Successfully!');
         } catch (error) {
             setResponseMessage(error.message);
             toast.error(`Error: ${error.message}`);
@@ -189,7 +189,7 @@ const MyList = () => {
             }
 
             setResponseMessage(data.message);
-            toast.success('withdraw Request Send to Admin successfully!');
+            toast.success('Withdraw Request Submited Successfully!');
         } catch (error) {
             setResponseMessage(error.message);
             toast.error(`Error: ${error.message}`);
@@ -210,7 +210,7 @@ const MyList = () => {
                 throw new Error(data.error || 'An error occurred while processing the request.');
             }
             setResponseMessage(data.message);
-            toast.success('Password update request submitted to admin');
+            toast.success('Password Update Request Submited');
         } catch (error) {
             setResponseMessage(error.message);
             toast.error(`Error: ${error.message}`);
@@ -237,7 +237,7 @@ const MyList = () => {
 
     const handleCopy = (text) => {
         navigator.clipboard.writeText(text);
-        toast.success('Copied to clipboard successfully!');
+        toast.success('Copied To Clipboard Successfully!');
     };
     if (loading) {
         return <div>Loading...</div>;
@@ -246,7 +246,6 @@ const MyList = () => {
     if (error) {
         return <div>Error: {error}</div>;
     }
-
 
     return (
         <>
@@ -293,7 +292,7 @@ const MyList = () => {
                             <div className={styles.id_created_lower_box}>
                                 <Image width={200} height={200} src={`https://manual.shyamplay.in/${id.logo}`} alt={`Image of ${id.logo}`} />
                                 <div className={styles.id_content_box}>
-                                    <Link href={`https://${id.website_link}`}>{id.website_link} <i className="fa-solid fa-arrow-up-right-from-square"></i></Link>
+                                    <Link href={`https://${id.website_link}`} target='_blank'>{id.website_link} <i className="fa-solid fa-arrow-up-right-from-square"></i></Link>
                                     {/* <p>Username: {id.name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.name}`)}></i></p>
                                     <p>Password: {id.password} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.password}`)}></i></p> */}
                                     <p>

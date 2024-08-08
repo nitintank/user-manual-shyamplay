@@ -267,6 +267,7 @@
   background-color: #0D3446;
   padding: 10px;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .popup_cross{
@@ -456,6 +457,10 @@
   background-color: #de9800;
   color: white;
   cursor: pointer;
+}
+
+.create_id_btn i{
+  font-size: 16px;
 }
 
 .demo_detail{
