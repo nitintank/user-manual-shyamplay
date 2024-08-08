@@ -34,7 +34,7 @@ export default function Home() {
   const togglePartOne = () => {
     setPartOne(!partone);
   };
-  
+
   const toggleCreateIdPopup = (company) => {
     setSelectedCompany(company);
     setDemoLoginPopup(false);
@@ -185,6 +185,11 @@ export default function Home() {
     }
   };
 
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard successfully!');
+};
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -248,103 +253,107 @@ export default function Home() {
           </div>
         )}
 
-        {createIdPopup && <div className={styles.pop_up_box_section}>
+        {createIdPopup && <div className={styles.main_popup_box}>
+          <div className={styles.pop_up_box_section}>
 
-          <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleCreateIdPopup}></i>
+            <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleCreateIdPopup}></i>
 
-          <h3>Create ID</h3>
-          <div className={styles.pop_up_site_box}>
-            <Image width={200} height={200} src={`https://manual.shyamplay.in/${selectedCompany.logo}`} alt={selectedCompany.name} />
-            <h4>{selectedCompany.company_name}</h4>
-            <p>{selectedCompany.website_link}</p>
-          </div>
+            <h3>Create ID</h3>
+            <div className={styles.pop_up_site_box}>
+              <Image width={200} height={200} src={`https://manual.shyamplay.in/${selectedCompany.logo}`} alt={selectedCompany.name} />
+              <h4>{selectedCompany.company_name}</h4>
+              <p>{selectedCompany.website_link}</p>
+            </div>
 
-          <form onSubmit={handleFormSubmit} className={styles.pop_up_box_form_1}>
-            {partone && <>
-              <input type="text" id="username" placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
-              <input type="text" id="amount" placeholder="Enter Amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-              <button className={styles.create_id_btn} onClick={togglePartOne}>Proceed <i class="fa-solid fa-circle-right"></i></button>
-            </>}
-            {!partone && <>
-              <div className={styles.radio_input}>
-                <label>
-                  <input name="paymentMethod" value="upi" onChange={() => handlePaymentMethodChange('upi')} type="radio" defaultChecked={paymentMethod === 'upi'} />
-                  <span>UPI</span>
-                </label>
-                <label>
-                  <input name="paymentMethod" value="bank" onChange={() => handlePaymentMethodChange('bank')} type="radio" />
-                  <span>Bank</span>
-                </label>
-                <span className={styles.selection}></span>
-              </div>
-              {paymentMethod === 'upi' && upiQRCode && (<div className={styles.upi_detail_box}>
-
-                <div className={styles.zradio_inputs}>
-                  {upiQRCode.map((upi, index) => (
-                    <label key={upi.id}>
-                      <input className={styles.zradio_input} type="radio" name="paymentDetail" value={upi.upi_id} onChange={handleUpiChange} />
-                      <span className={styles.zradio_tile}>
-                        <span className={styles.zradio_icon}>
-                          <Image width={200} height={200} src="/images/upi.png" alt="UPI QR Code" />
-                        </span>
-                        <span className={styles.zradio_label}>UPI {index + 1}</span>
-                      </span>
-                    </label>
-                  ))}
+            <form onSubmit={handleFormSubmit} className={styles.pop_up_box_form_1}>
+              {partone && <>
+                <input type="text" id="username" placeholder="Enter Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                <input type="text" id="amount" placeholder="Enter Amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+                <button className={styles.create_id_btn} onClick={togglePartOne}>Proceed <i class="fa-solid fa-circle-right"></i></button>
+              </>}
+              {!partone && <>
+                <div className={styles.radio_input}>
+                  <label>
+                    <input name="paymentMethod" value="upi" onChange={() => handlePaymentMethodChange('upi')} type="radio" defaultChecked={paymentMethod === 'upi'} />
+                    <span>UPI</span>
+                  </label>
+                  <label>
+                    <input name="paymentMethod" value="bank" onChange={() => handlePaymentMethodChange('bank')} type="radio" />
+                    <span>Bank</span>
+                  </label>
+                  <span className={styles.selection}></span>
                 </div>
-                {selectedUpiId && (
-                  <>
-                    <Image width={200} height={200} src={`https://manual.shyamplay.in/${upiQRCode.find(upi => upi.upi_id === selectedUpiId).qr_code}`} alt="UPI QR Code" className={styles.qr_code_img} />
-                    <p className={styles.upi_para}>UPI Id = {selectedUpiId} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedUpiId}`)}></i></p>
-                  </>)}
-                <input type="text" placeholder="Enter UTR ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
-                <label htmlFor="">Payment Screenshot</label>
-                <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />
-              </div>
-              )}
-              {paymentMethod === 'bank' && bankDetails && (
-                <div className={styles.bank_detail_box}>
+                {paymentMethod === 'upi' && upiQRCode && (<div className={styles.upi_detail_box}>
 
                   <div className={styles.zradio_inputs}>
-                    {bankDetails.map((bank, index) => (
-                      <label kkey={bank.id}>
-                        <input className={styles.zradio_input} type="radio" name="paymentDetail" value={bank.bank_name} onChange={handleBankChange} />
+                    {upiQRCode.map((upi, index) => (
+                      <label key={upi.id}>
+                        <input className={styles.zradio_input} type="radio" name="paymentDetail" value={upi.upi_id} onChange={handleUpiChange} />
                         <span className={styles.zradio_tile}>
                           <span className={styles.zradio_icon}>
-                            <Image width={200} height={200} src="/images/bank.jpeg" alt="UPI QR Code" />
+                            <Image width={200} height={200} src="/images/upi.png" alt="UPI QR Code" />
                           </span>
                           <span className={styles.zradio_label}>UPI {index + 1}</span>
                         </span>
                       </label>
                     ))}
                   </div>
-                  {selectedBank && (
+                  {selectedUpiId && (
                     <>
-                      <p>Bank Name: {selectedBank.bank_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_name}`)}></i></p>
-                      <p>Account Number: {selectedBank.bank_account_number} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_account_number}`)}></i></p>
-                      <p>IFSC Code: {selectedBank.ifsc_code} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.ifsc_code}`)}></i></p>
-                      <p>Account Name: {selectedBank.account_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.account_name}`)}></i></p>
-                    </>
-                  )}
-                  <input type="text" placeholder="Enter Transaction ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
+                      <Image width={200} height={200} src={`https://manual.shyamplay.in/${upiQRCode.find(upi => upi.upi_id === selectedUpiId).qr_code}`} alt="UPI QR Code" className={styles.qr_code_img} />
+                      <p className={styles.upi_para}>UPI Id = {selectedUpiId} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedUpiId}`)}></i></p>
+                    </>)}
+                  <input type="text" placeholder="Enter UTR ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
                   <label htmlFor="">Payment Screenshot</label>
                   <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />
                 </div>
-              )}
-              <button type="submit" className={styles.create_id_btn}><i className="fa-solid fa-circle-check"></i> Create Instant ID</button>
-            </>}
-          </form>
+                )}
+                {paymentMethod === 'bank' && bankDetails && (
+                  <div className={styles.bank_detail_box}>
+
+                    <div className={styles.zradio_inputs}>
+                      {bankDetails.map((bank, index) => (
+                        <label kkey={bank.id}>
+                          <input className={styles.zradio_input} type="radio" name="paymentDetail" value={bank.bank_name} onChange={handleBankChange} />
+                          <span className={styles.zradio_tile}>
+                            <span className={styles.zradio_icon}>
+                              <Image width={200} height={200} src="/images/bank.jpeg" alt="UPI QR Code" />
+                            </span>
+                            <span className={styles.zradio_label}>UPI {index + 1}</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    {selectedBank && (
+                      <>
+                        <p>Bank Name: {selectedBank.bank_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_name}`)}></i></p>
+                        <p>Account Number: {selectedBank.bank_account_number} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.bank_account_number}`)}></i></p>
+                        <p>IFSC Code: {selectedBank.ifsc_code} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.ifsc_code}`)}></i></p>
+                        <p>Account Name: {selectedBank.account_name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${selectedBank.account_name}`)}></i></p>
+                      </>
+                    )}
+                    <input type="text" placeholder="Enter Transaction ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
+                    <label htmlFor="">Payment Screenshot</label>
+                    <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />
+                  </div>
+                )}
+                <button type="submit" className={styles.create_id_btn}><i className="fa-solid fa-circle-check"></i> Create Instant ID</button>
+              </>}
+            </form>
+          </div>
         </div>}
 
-        {demoLoginPopup && <div className={styles.pop_up_box_section} id="demo-login-popup">
-          <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleDemoLoginPopup}></i>
-          <h3>Demo Login</h3>
-          <div className={styles.pop_up_site_box}>
-            <Image width={200} height={200} src={`https://manual.shyamplay.in/${demoCompany.logo}`} alt={demoCompany.name} />
-            <h4>{demoCompany.company_name}</h4>
-            <p>{demoCompany.website_link}</p>
-            <p className={styles.demo_detail}>Username - {demoCompany.name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${demoCompany.name}`)}></i></p>
-            <p className={styles.demo_detail}>Password - {demoCompany.password} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${demoCompany.password}`)}></i></p>
+        {demoLoginPopup && <div className={styles.main_popup_box}>
+          <div className={styles.pop_up_box_section} id="demo-login-popup">
+            <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleDemoLoginPopup}></i>
+            <h3>Demo Login</h3>
+            <div className={styles.pop_up_site_box}>
+              <Image width={200} height={200} src={`https://manual.shyamplay.in/${demoCompany.logo}`} alt={demoCompany.name} />
+              <h4>{demoCompany.company_name}</h4>
+              <p>{demoCompany.website_link}</p>
+              <p className={styles.demo_detail}>Username - {demoCompany.name} <i className="fa-solid fa-copy" onClick={() => handleCopy(demoCompany.name)}></i></p>
+              <p className={styles.demo_detail}>Password - {demoCompany.password} <i className="fa-solid fa-copy" onClick={() => handleCopy(demoCompany.password)}></i></p>
+            </div>
           </div>
         </div>}
       </section>
