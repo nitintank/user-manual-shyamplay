@@ -296,8 +296,8 @@ const MyList = () => {
                                     {/* <p>Username: {id.name} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.name}`)}></i></p>
                                     <p>Password: {id.password} <i className="fa-solid fa-copy" onClick={() => navigator.clipboard.writeText(`${id.password}`)}></i></p> */}
                                     <p>
-                                    Username: {id.name} 
-                                    <i className="fa-solid fa-copy" onClick={() => handleCopy(id.name)}></i>
+                                    Username: {id.username} 
+                                    <i className="fa-solid fa-copy" onClick={() => handleCopy(id.username)}></i>
                                 </p>
                                 <p>
                                     Password: {id.password} 
