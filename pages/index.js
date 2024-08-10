@@ -178,6 +178,8 @@ export default function Home() {
     }
   };
 
+
+
   if (loading) {
     return <div>Loading...</div>;
   }
