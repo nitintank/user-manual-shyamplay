@@ -26,7 +26,7 @@ const MyList = () => {
     const [ifscCode, setIfscCode] = useState('');
     const [upiID, setUpiID] = useState('');
     const [paymentScreenshot, setPaymentScreenshot] = useState(null);
-    const [qrcodeimage, setQrcodeImage] = useState(null);
+    const [qrcodeimage, setQrcodeImage] = useState('');
     const [upiRefNumber, setUpiRefNumber] = useState('');
     const [selectedUpiId, setSelectedUpiId] = useState('');
     const [adminUpiId, setAdminUpiId] = useState('');
@@ -206,9 +206,7 @@ const MyList = () => {
         formData.append('amount', amount);
         if (paymentMethod === 'upi') {
             formData.append('upi_id', upiID);
-            if (qrcodeimage) {
-                formData.append('qr_code_image', qrcodeimage);
-            }
+            formData.append('qr_code_image', qrcodeimage);
         } else if (paymentMethod === 'bank') {
             formData.append('account_name', accountName);
             formData.append('account_number', accountNumber);
@@ -217,13 +215,11 @@ const MyList = () => {
 
         const formData2 = new FormData();
         formData2.append('payment_method', paymentMethod);
-        if (paymentMethod === 'upi') {
-            formData2.append('upi_id', upiID);
-        } else if (paymentMethod === 'bank') {
-            formData2.append('account_name', accountName);
-            formData2.append('account_number', accountNumber);
-            formData2.append('ifsc_code', ifscCode);
-        }
+        formData2.append('upi_id', upiID);
+        formData2.append('qr_code_image', qrcodeimage);
+        formData2.append('account_name', accountName);
+        formData2.append('account_number', accountNumber);
+        formData2.append('ifsc_code', ifscCode);
 
         try {
             // const response = await fetch(`https://manual.shyamplay.in/user/${selectedId}/withdraw`, {
@@ -248,7 +244,7 @@ const MyList = () => {
                     },
                     body: formData2,
                 })
-              ]);
+            ]);
 
             const data = await response.json();
             const data2 = await response2.json();
@@ -526,14 +522,13 @@ const MyList = () => {
                                         </tbody>
                                     </table>
                                 ) : (
-                                   ""
+                                    ""
                                 )}
 
                                 {paymentMethod === 'upi' && (
                                     <div className={styles.upi_detail_box}>
                                         <input id="upiID" type="text" placeholder="Enter UPI ID" value={upiID} onChange={(e) => setUpiID(e.target.value)} required />
-                                        <label>QR Code</label>
-                                        <input id="qrcodeimage" type="file" onChange={(e) => setQrcodeImage(e.target.files[0])} />
+                                        <input id="qrcodeimage" type="text" placeholder="Enter UPI Name" value={qrcodeimage} onChange={(e) => setQrcodeImage(e.target.value)} required />
                                     </div>
                                 )}
 
