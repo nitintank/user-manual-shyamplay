@@ -44,7 +44,7 @@ const MyList = () => {
         setSelectedId(id);
         setDepositPopup(false);
         setWithdrawPopup(!withdrawPopup);
-
+        setPaymentMethod('upi')
         if (!withdrawPopup) {
             const userId = localStorage.getItem('userId');
             try {
@@ -253,7 +253,6 @@ const MyList = () => {
                 const errorText = await response.text(); // Read the response body as text
                 throw new Error(`Error: ${response.status} - ${errorText}`);
             }
-
             setResponseMessage(data.message);
             toast.success('Withdraw Request Submited Successfully!');
             setWithdrawPopup(false);
@@ -262,8 +261,6 @@ const MyList = () => {
             toast.error(`Error: ${error.message}`);
         }
     };
-
-
 
     const handlePasswordUpdateRequest = async (id) => {
         try {
@@ -314,10 +311,10 @@ const MyList = () => {
             const response = await fetch(`https://manual.shyamplay.in/user/delete-bank-upi-detail/${id}`, {
                 method: 'DELETE',
                 headers: {
-                   'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Ensure the JWT token is being sent
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Ensure the JWT token is being sent
                 },
             });
-    
+
             if (response.ok) {
                 // Optionally, refresh the list of bank/UPI details
                 setAccountDetails(accountDetails.filter(account => account.id !== id));
@@ -331,7 +328,7 @@ const MyList = () => {
             alert('An error occurred while deleting the bank/UPI detail');
         }
     };
-    
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -509,67 +506,110 @@ const MyList = () => {
                                     <span className={styles.selection}></span>
                                 </div>
 
-                                {Array.isArray(accountDetails) && accountDetails.length > 0 ? (
-                                    <table className={styles.customers}>
-                                        <thead>
-                                            <tr>
-                                                <th>Select</th>
-                                                <th>UPI ID / Account No.</th>
-                                                <th>Account Name</th>
-                                                <th>IFSC Code</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {accountDetails.map((account, index) => (
-                                                account.account_name && (
-                                                    <tr key={index}>
-                                                        <td>
-                                                            <input
-                                                                type="radio"
-                                                                name="pay"
-                                                                value={account.account_name}
-                                                                checked={selectedAccount === account.account_name}
-                                                                onChange={() => {
-                                                                    setSelectedAccount(account.account_name);
-                                                                    setAccountName(account.account_name);
-                                                                    setAccountNumber(account.account_number);
-                                                                    setIfscCode(account.ifsc);
-                                                                }}
-                                                            />
-                                                        </td>
-                                                        <td>{account.account_number}</td>
-                                                        <td>{account.account_name}</td>
-                                                        <td>{account.ifsc}</td>
-                                                        <td>
-                            <button
-                                onClick={() => handleDelete(account.id)}
-                            >
-                                Delete
-                            </button>
-                        </td>
-                                                    </tr>
-                                                )
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                ) : (
-                                    ""
-                                )}
-
                                 {paymentMethod === 'upi' && (
-                                    <div className={styles.upi_detail_box}>
-                                        <input id="upiID" type="text" placeholder="Enter UPI ID" value={upiID} onChange={(e) => setUpiID(e.target.value)} required />
-                                        <input id="qrcodeimage" type="text" placeholder="Enter UPI Name" value={qrcodeimage} onChange={(e) => setQrcodeImage(e.target.value)} required />
-                                    </div>
+                                    <>
+                                        {Array.isArray(accountDetails) && accountDetails.length > 0 ? (
+                                            <table className={styles.customers}>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Select</th>
+                                                        <th>UPI Name</th>
+                                                        <th>UPI ID</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {accountDetails.map((account, index) => (
+                                                        account.upi_id && (
+                                                            <tr key={index}>
+                                                                <td>
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="pay1"
+                                                                        value={account.upi_id}
+                                                                        checked={selectedAccount === account.upi_id}
+                                                                        onChange={() => {
+                                                                            setSelectedAccount(account.upi_id);
+                                                                            setUpiID(account.upi_id);
+                                                                            setQrcodeImage(account.qr_code);
+                                                                        }}
+                                                                    />
+                                                                </td>
+                                                                <td>{account.qr_code}</td>
+                                                                <td>{account.upi_id}</td>
+                                                                <td>
+                                                                    <button onClick={() => handleDelete(account.id)}>
+                                                                        Delete
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        ) : (
+                                            ""
+                                        )}
+                                        <div className={styles.upi_detail_box}>
+                                            <input id="upiID" type="text" placeholder="Enter UPI ID" value={upiID} onChange={(e) => setUpiID(e.target.value)} required />
+                                            <input id="qrcodeimage" type="text" placeholder="Enter UPI Name" value={qrcodeimage} onChange={(e) => setQrcodeImage(e.target.value)} required />
+                                        </div>
+                                    </>
                                 )}
 
                                 {paymentMethod === 'bank' && (
-                                    <div className={styles.bank_detail_box}>
-                                        <input type="text" id="accountName" placeholder="Enter Account Name" value={accountName} onChange={(e) => setAccountName(e.target.value)} />
-                                        <input type="text" id="accountNumber" placeholder="Enter Account Number" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />
-                                        <input type="text" id="ifscCode" placeholder="Enter IFSC Code" value={ifscCode} onChange={(e) => setIfscCode(e.target.value)} />
-                                    </div>
+                                    <>
+                                        {Array.isArray(accountDetails) && accountDetails.length > 0 ? (
+                                            <table className={styles.customers}>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Select</th>
+                                                        <th>Account No.</th>
+                                                        <th>Account Name</th>
+                                                        <th>IFSC Code</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {accountDetails.map((account, index) => (
+                                                        account.account_name && (
+                                                            <tr key={index}>
+                                                                <td>
+                                                                    <input
+                                                                        type="radio"
+                                                                        name="pay"
+                                                                        value={account.account_name}
+                                                                        checked={selectedAccount === account.account_name}
+                                                                        onChange={() => {
+                                                                            setSelectedAccount(account.account_name);
+                                                                            setAccountName(account.account_name);
+                                                                            setAccountNumber(account.account_number);
+                                                                            setIfscCode(account.ifsc);
+                                                                        }}
+                                                                    />
+                                                                </td>
+                                                                <td>{account.account_number}</td>
+                                                                <td>{account.account_name}</td>
+                                                                <td>{account.ifsc}</td>
+                                                                <td>
+                                                                    <button onClick={() => handleDelete(account.id)}>
+                                                                        Delete
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        ) : (
+                                            ""
+                                        )}
+                                        <div className={styles.bank_detail_box}>
+                                            <input type="text" id="accountName" placeholder="Enter Account Name" value={accountName} onChange={(e) => setAccountName(e.target.value)} />
+                                            <input type="text" id="accountNumber" placeholder="Enter Account Number" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />
+                                            <input type="text" id="ifscCode" placeholder="Enter IFSC Code" value={ifscCode} onChange={(e) => setIfscCode(e.target.value)} />
+                                        </div>
+                                    </>
                                 )}
 
                                 <button type="submit" className={styles.create_id_btn} onClick={handleWithdrawSubmit}><i className="fa-solid fa-circle-check"></i> Withdraw Now</button>
