@@ -9,6 +9,9 @@ const MyList = () => {
     const [depositPopup, setDepositPopup] = useState(false);
     const [withdrawPopup, setWithdrawPopup] = useState(false);
     const [sidebar, setSidebar] = useState(false);
+    const [selectedAccount, setSelectedAccount] = useState('');
+
+    const [accountDetails, setAccountDetails] = useState([]);
     const [mycreateId, setMycreateId] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -29,48 +32,57 @@ const MyList = () => {
     const [adminUpiId, setAdminUpiId] = useState('');
     const [adminBankId, setAdminBankId] = useState('');
     const [selectedBank, setSelectedBank] = useState(null);
+    const [WithdrawDetails, setWithdrawDetails] = useState(null)
 
     const toggleDepositPopup = (id) => {
         setSelectedId(id);
         setWithdrawPopup(false);
         setDepositPopup(!depositPopup);
     };
-    // const toggleWithdrawPopup = (id) => {
-    //     setSelectedId(id);
-    //     setDepositPopup(false);
-    //     setWithdrawPopup(!withdrawPopup);
-    // };
-    const toggleWithdrawPopup = async(id) => {
+
+    const toggleWithdrawPopup = async (id) => {
         setSelectedId(id);
         setDepositPopup(false);
         setWithdrawPopup(!withdrawPopup);
 
         if (!withdrawPopup) {
+            const userId = localStorage.getItem('userId');
             try {
-                const response = await fetch(`https://manual.shyamplay.in/user/${id}/withdraws`, {
+                const response = await fetch(`https://manual.shyamplay.in/user/get-bank-upi-details`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
                     },
                 });
-    
+
                 if (!response.ok) {
                     throw new Error(`Error: ${response.status}`);
                 }
-    
+
                 const data = await response.json();
-                setWithdrawDetails(data);
+                console.log('API Response:', data); // Log the response to inspect it
+
+                // Set accountDetails with the extracted array
+                if (data && Array.isArray(data.bank_upi_details)) {
+                    setAccountDetails(data.bank_upi_details);
+                } else {
+                    console.error('Unexpected data format:', data);
+                }
+
             } catch (error) {
                 setResponseMessage(error.message);
-                toast.error(`Error: ${error.message}`);
+                // toast.error(`Error: ${error.message}`);
             }
         }
-      
     };
+
     const toggleSidebar = () => {
         setSidebar(!sidebar);
     };
 
+
+    //   const handleAmountChange = (e) => setAmount(e.target.value);
+    //   const handlePaymentMethodChange = (method) => setPaymentMethod(method);
     useEffect(() => {
         const fetchCompanies = async () => {
             try {
@@ -188,6 +200,7 @@ const MyList = () => {
     };
 
     const handleWithdrawSubmit = async () => {
+        const userId = localStorage.getItem('userId');
         const formData = new FormData();
         formData.append('payment_method', paymentMethod);
         formData.append('amount', amount);
@@ -202,18 +215,47 @@ const MyList = () => {
             formData.append('ifsc_code', ifscCode);
         }
 
+        const formData2 = new FormData();
+        formData2.append('payment_method', paymentMethod);
+        if (paymentMethod === 'upi') {
+            formData2.append('upi_id', upiID);
+        } else if (paymentMethod === 'bank') {
+            formData2.append('account_name', accountName);
+            formData2.append('account_number', accountNumber);
+            formData2.append('ifsc_code', ifscCode);
+        }
+
         try {
-            const response = await fetch(`https://manual.shyamplay.in/user/${selectedId}/withdraw`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-                },
-                body: formData,
-            });
+            // const response = await fetch(`https://manual.shyamplay.in/user/${selectedId}/withdraw`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            //     },
+            //     body: formData,
+            // });
+            const [response, response2] = await Promise.all([
+                fetch(`https://manual.shyamplay.in/user/${selectedId}/withdraw`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                    },
+                    body: formData,
+                }),
+                fetch(`https://manual.shyamplay.in/user/save-bank-upi-details`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                    },
+                    body: formData2,
+                })
+              ]);
 
             const data = await response.json();
+            const data2 = await response2.json();
+            console.log(data2)
             if (!response.ok) {
-                throw new Error(data.error || 'An error occurred while processing the request.');
+                const errorText = await response.text(); // Read the response body as text
+                throw new Error(`Error: ${response.status} - ${errorText}`);
             }
 
             setResponseMessage(data.message);
@@ -224,6 +266,8 @@ const MyList = () => {
             toast.error(`Error: ${error.message}`);
         }
     };
+
+
 
     const handlePasswordUpdateRequest = async (id) => {
         try {
@@ -302,11 +346,11 @@ const MyList = () => {
                 </nav>
 
                 <div className={`${styles.switch_toggle} ${styles.switch_3} ${styles.switch_candy}`}>
-                    <input id="all" name="state-d" type="radio" checked />
-                    <label for="all">My List</label>
+                    <input id="all" name="state-d" type="radio" defaultChecked />
+                    <label htmlFor="all">My List</label>
                     <Link href="/">
                         <input id="approved" name="state-d" type="radio" />
-                        <label for="approved" className={styles.wid_100}>Create ID</label>
+                        <label htmlFor="approved" className={styles.wid_100}>Create ID</label>
                     </Link>
                 </div>
 
@@ -387,7 +431,7 @@ const MyList = () => {
                                     </>
                                 )}
                                 <input type="text" placeholder="Enter UTR ID" id="upiRefNumber" value={upiRefNumber} onChange={(e) => setUpiRefNumber(e.target.value)} required />
-                                <label for="">Payment Screenshot</label>
+                                <label htmlFor="">Payment Screenshot</label>
                                 <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />
                             </div>
                             )}
@@ -416,7 +460,7 @@ const MyList = () => {
                                     )}
                                     <input type="text" placeholder="Enter Transaction ID" id="upiRefNumber" value={upiRefNumber}
                                         onChange={(e) => setUpiRefNumber(e.target.value)} required />
-                                    <label for="">Payment Screenshot</label>
+                                    <label htmlFor="">Payment Screenshot</label>
                                     <input id="paymentScreenshot" type="file" onChange={(e) => setPaymentScreenshot(e.target.files[0])} />
                                 </div>
                             )}
@@ -425,44 +469,88 @@ const MyList = () => {
                     </div>
                 </div>}
 
-                {withdrawPopup && <div className={styles.main_popup_box}>
-                    <div className={styles.pop_up_box_section} id="withdraw-popup">
-                        <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleWithdrawPopup}></i>
-                        <h3>Withdraw Amount</h3>
-                        <div className={styles.pop_up_box_form_1}>
-                            <input type="text" placeholder="Enter Amount" value={amount} onChange={handleAmountChange} />
-                            <div className={styles.radio_input}>
-                                <label>
-                                    <input name="paymentMethod" value="upi" onChange={() => handlePaymentMethodChange('upi')} type="radio" defaultChecked={paymentMethod === 'upi'} />
-                                    <span>UPI</span>
-                                </label>
-                                <label>
-                                    <input name="paymentMethod" value="bank" onChange={() => handlePaymentMethodChange('bank')} type="radio" />
-                                    <span>Bank</span>
-                                </label>
-                                <span className={styles.selection}></span>
+                {withdrawPopup && (
+                    <div className={styles.main_popup_box}>
+                        <div className={styles.pop_up_box_section} id="withdraw-popup">
+                            <i className={`fa-regular fa-circle-xmark ${styles.popup_cross}`} onClick={toggleWithdrawPopup}></i>
+                            <h3>Withdraw Amount</h3>
+                            <div className={styles.pop_up_box_form_1}>
+                                <input type="text" placeholder="Enter Amount" value={amount} onChange={handleAmountChange} />
+
+                                <div className={styles.radio_input}>
+                                    <label>
+                                        <input name="paymentMethod" value="upi" onChange={() => handlePaymentMethodChange('upi')} type="radio" defaultChecked={paymentMethod === 'upi'} />
+                                        <span>UPI</span>
+                                    </label>
+                                    <label>
+                                        <input name="paymentMethod" value="bank" onChange={() => handlePaymentMethodChange('bank')} type="radio" />
+                                        <span>Bank</span>
+                                    </label>
+                                    <span className={styles.selection}></span>
+                                </div>
+
+                                {Array.isArray(accountDetails) && accountDetails.length > 0 ? (
+                                    <table className={styles.customers}>
+                                        <thead>
+                                            <tr>
+                                                <th>Select</th>
+                                                <th>UPI ID / Account No.</th>
+                                                <th>Account Name</th>
+                                                <th>IFSC Code</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {accountDetails.map((account, index) => (
+                                                account.account_name && (
+                                                    <tr key={index}>
+                                                        <td>
+                                                            <input
+                                                                type="radio"
+                                                                name="pay"
+                                                                value={account.account_name}
+                                                                checked={selectedAccount === account.account_name}
+                                                                onChange={() => {
+                                                                    setSelectedAccount(account.account_name);
+                                                                    setAccountName(account.account_name);
+                                                                    setAccountNumber(account.account_number);
+                                                                    setIfscCode(account.ifsc);
+                                                                }}
+                                                            />
+                                                        </td>
+                                                        <td>{account.account_number}</td>
+                                                        <td>{account.account_name}</td>
+                                                        <td>{account.ifsc}</td>
+                                                    </tr>
+                                                )
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                   ""
+                                )}
+
+                                {paymentMethod === 'upi' && (
+                                    <div className={styles.upi_detail_box}>
+                                        <input id="upiID" type="text" placeholder="Enter UPI ID" value={upiID} onChange={(e) => setUpiID(e.target.value)} required />
+                                        <label>QR Code</label>
+                                        <input id="qrcodeimage" type="file" onChange={(e) => setQrcodeImage(e.target.files[0])} />
+                                    </div>
+                                )}
+
+                                {paymentMethod === 'bank' && (
+                                    <div className={styles.bank_detail_box}>
+                                        <input type="text" id="accountName" placeholder="Enter Account Name" value={accountName} onChange={(e) => setAccountName(e.target.value)} />
+                                        <input type="text" id="accountNumber" placeholder="Enter Account Number" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />
+                                        <input type="text" id="ifscCode" placeholder="Enter IFSC Code" value={ifscCode} onChange={(e) => setIfscCode(e.target.value)} />
+                                    </div>
+                                )}
+
+                                <button type="submit" className={styles.create_id_btn} onClick={handleWithdrawSubmit}><i className="fa-solid fa-circle-check"></i> Withdraw Now</button>
                             </div>
-                            {paymentMethod === 'upi' && (
-                                <div className={styles.upi_detail_box}>
-                                    <input id="upiID" type="text" placeholder="Enter UPI ID" value={upiID} onChange={(e) => setUpiID(e.target.value)} required />
-                                    <label for="">QR Code</label>
-                                    <input id="qrcodeimage" type="file" onChange={(e) => setQrcodeImage(e.target.files[0])} />
-                                </div>
-                            )}
-                            {paymentMethod === 'bank' && (
-                                <div className={styles.bank_detail_box}>
-                                    <input type="text" id="accountName" placeholder="Enter Account Name" value={accountName}
-                                        onChange={(e) => setAccountName(e.target.value)} required />
-                                    <input type="text" id="accountNumber" placeholder="Enter Account Number" value={accountNumber}
-                                        onChange={(e) => setAccountNumber(e.target.value)} required />
-                                    <input type="text" id="ifscCode" placeholder="Enter IFSC Code" value={ifscCode}
-                                        onChange={(e) => setIfscCode(e.target.value)} required />
-                                </div>
-                            )}
-                            <button type="submit" className={styles.create_id_btn} onClick={handleWithdrawSubmit}><i className="fa-solid fa-circle-check"></i> Withdraw Now</button>
                         </div>
                     </div>
-                </div>}
+                )}
+
             </section>
         </>
     )
